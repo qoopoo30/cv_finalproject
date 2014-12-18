@@ -32,9 +32,10 @@ for a = 1 : num_images
     if strcmp(dir, 'test')
         image = imresize(image, 0.1);
     end
-    [~, d] = vl_sift(single(image));
-    descriptor = double(d');
-    D = vl_alldist2(SIFT_vocab', single(descriptor'));
+    
+    [~, d] = vl_dsift(single(image), 'step', 6, 'fast');
+    %descriptor = double(d');
+    D = vl_alldist2(SIFT_vocab', single(d));
     [~, cate] = min(D);
     H = hist(cate, vocab_size);
     image_feats(a,:) = zscore(H);
