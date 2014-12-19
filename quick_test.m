@@ -21,12 +21,12 @@ for m = 1 : length(train_files)
 end
 vocab_size = 4000;
 [centers, ~] = vl_kmeans(single(S), vocab_size);
-SIFT_vocab = centers';
-save('SIFT_vocab.mat', 'SIFT_vocab')
+vocab = centers';
+save('vocab.mat', 'vocab')
 %}
 test_feats = calculate_BoSIFT('test', test_files);
-train_feats = calculate_BoSIFT('cover', train_files);
-% load train_BoSIFT.mat
+%train_feats = calculate_BoSIFT('cover', train_files);
+load train_bos.mat
 
 vocab_size = 3;
 [centers, A] = vl_kmeans(single(train_feats'), vocab_size);

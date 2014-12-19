@@ -1,3 +1,4 @@
+%%
 clear, close all
 
 SIFT_files = dir( fullfile( 'cover_SIFT', '*.mat') );
@@ -7,9 +8,19 @@ num_images = length(train_files);
 num_test = length(test_files);
 correct = 0;
 
+%%
+if ~exist('vocab.mat', 'file')
+    fprintf('No existing visual word vocabulary found. Computing one from training images\n')
+    vocab_size = 400; %Larger values will work better (to a point) but be slower to compute
+    vocab = build_vocab('cover', train_files, vocab_size);
+    save('vocab.mat', 'vocab')
+end
 %load train_gist.mat
+%train_feats = calculate_gist('cover', train_files);
 %test_feats = calculate_gist('test', test_files);
-train_feats = calculate_BoSIFT('cover', train_files);
+
+load train_bos.mat
+%train_feats = calculate_BoSIFT('cover', train_files);
 test_feats = calculate_BoSIFT('test', test_files);
 
 
@@ -17,10 +28,11 @@ D = vl_alldist2(test_feats', train_feats');
 Q = sort(D, 2);
 confidence = Q(:,2) - Q(:,1);
 
-[~, b] = min(D, [], 2);
+%[~, b] = min(D, [], 2);
 
+%%
 for m = 1 : num_test
-    if confidence(m) > 100
+    if confidence(m) > 1000
         predict = train_files(b(m)).name;
         predict = predict(1:length(predict)-4);
         fprintf(['This book is ', predict, '\n'])
@@ -30,10 +42,11 @@ for m = 1 : num_test
         [~, d] = vl_sift(single(test_img));
         des1 = double(d');
         
-        temp = Q(m, 1:80);
-        score = zeros(80, 1);
+        threshold = 30;
+        temp = Q(m, 1:threshold);
+        score = zeros(threshold, 1);
         Take2Match = struct([]);
-        for k = 1:80
+        for k = 1:threshold
             Take2Match(k).name = SIFT_files(D(m,:)==temp(k)).name;
             des2 = fullfile( 'cover_SIFT', Take2Match(k).name);
             load(des2)
@@ -54,4 +67,4 @@ for m = 1 : num_test
         correct = correct +1;
     end
 end
-accuracy = correct/num_test
+Accuracy = correct/num_test

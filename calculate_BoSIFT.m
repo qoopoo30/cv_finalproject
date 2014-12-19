@@ -1,41 +1,26 @@
 function image_feats = calculate_BoSIFT(dir, image_files)
 
-load SIFT_vocab.mat
-vocab_size = size(SIFT_vocab, 1);
+load vocab.mat
+vocab_size = size(vocab, 1);
 num_images = length(image_files);
 image_feats = zeros(num_images, vocab_size);
 
-%{
-if strcmp(dir, 'cover_SIFT')
-    for m = 1 : num_images
-        load(fullfile( dir, image_files(m).name));
-        D = vl_alldist2(SIFT_vocab', single(descriptor'));
-        [~, cate] = min(D);
-        H = hist(cate, vocab_size);
-        image_feats(m,:) = zscore(H);
-    end
-else
-    for a = 1 : num_images
+for a = 1 : num_images
+    
+    if strcmp(dir, 'test')
         image = rgb2gray(imread(fullfile( dir, image_files(a).name)));
         image = imresize(image, 0.1);
-        [~, d] = vl_sift(single(image));
-        descriptor = double(d');
-        D = vl_alldist2(SIFT_vocab', single(descriptor'));
-        [~, cate] = min(D);
-        H = hist(cate, vocab_size);
-        image_feats(a,:) = zscore(H);
-    end
-end
-%}
-for a = 1 : num_images
-    image = rgb2gray(imread(fullfile( dir, image_files(a).name)));
-    if strcmp(dir, 'test')
-        image = imresize(image, 0.1);
+        row_gap = floor(size(image, 1)*0.2/2);
+        col_gap = floor(size(image, 2)*0.2/2);
+        image = image(row_gap : size(image, 1) - row_gap,...
+            col_gap : size(image, 2) - col_gap);
+    else
+        image = rgb2gray(imread(fullfile( dir, image_files(a).name)));
     end
     
-    [~, d] = vl_dsift(single(image), 'step', 6, 'fast');
+    [~, d] = vl_dsift(im2single(image), 'step', 4, 'size', 6);
     %descriptor = double(d');
-    D = vl_alldist2(SIFT_vocab', single(d));
+    D = vl_alldist2(vocab', single(d));
     [~, cate] = min(D);
     H = hist(cate, vocab_size);
     image_feats(a,:) = zscore(H);
