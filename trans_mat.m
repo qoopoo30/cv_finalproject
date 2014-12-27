@@ -1,6 +1,4 @@
 function [ H ] = trans_mat( p1, p2 )
-%PROJECTION_ 此处显示有关此函数的摘要
-%   此处显示详细说明
 
 A = zeros(3, 3);
 for i = 0:3

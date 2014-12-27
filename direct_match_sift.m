@@ -25,12 +25,12 @@ for i = 1 : num_test
     end
 
     [~, x] = max(score);
-    predict = image_files(x).name;
-    predict = predict(1:length(predict)-4);
+    predict = image_files(x).name(1:end-4);
+    %predict = predict(1:length(predict)-4);
     fprintf(['This book is ', predict, '\n'])
     
-    true = test_files(i).name;
-    true = true(1:length(true)-4);
+    true = test_files(i).name(1:end-7);
+    %true = true(1:length(true)-4);
     fprintf(['Actually its ', true, '\n'])
     if strcmp(predict,true)
         correct = correct +1;

@@ -1,15 +1,24 @@
 clear, close all
 
-train_files = dir( fullfile( 'cover', '*.jpg') );
+train_files = dir( fullfile( 'new_cover', '*.jpg') );
 num_images = length(train_files);
 
-for k = 1 : 2%num_images
-    im = rgb2gray(imread(fullfile( 'cover', train_files(k).name)));
+for k = 1 : num_images
+    im = rgb2gray(imread(fullfile( 'new_cover', train_files(k).name)));
     im2 = zeros(size(im)) + 255;
 
     [height, width, ~] = size(im);
     p1 = [1 1; 1 width-1; height-1 1; height-1 width-1];
-    p2 = [20 1; 1 width-1; height-20 1; height-1 width-1];
+    %p2 = [30 1; 1 width-1; height-30 1; height-1 width-1];
+    %p2 = [1 1; 30 width-1; height-1 1; height-30 width-1];
+    %p2 = [30 25; 30 width-25; height-25 1; height-25 width-1];
+    
+    if size(im,1)>size(im,2)
+        p2 = [30 1; 30 width-1; height-30 25; height-30 width-25];
+    else
+        p2 = [20 1; 20 width-1; height-20 25; height-20 width-25];
+    end
+    
 
     %A
     H2 = trans_mat(p2, p1);
@@ -36,5 +45,7 @@ for k = 1 : 2%num_images
     end
 
     %figure,imshow(uint8(im2))
-    imwrite(uint8(im2), fullfile('create_cover', train_files(k).name))
+    A = train_files(k).name;
+    A = A(1:length(A)-4);
+    imwrite(uint8(im2), fullfile('create_cover', [A, '(4)', '.jpg']))
 end
